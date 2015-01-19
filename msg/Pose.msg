@@ -1,0 +1,10 @@
+Header header
+sensor_msgs/CameraInfo camera_info
+float64 x
+float64 y
+float64 theta
+float64 height
+float64 width
+float64 distance
+float64[2] cov
+PerceptInfo info

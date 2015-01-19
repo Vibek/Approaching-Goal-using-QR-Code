@@ -1,0 +1,1 @@
+/usr/bin/c++  -fPIC -g   -shared -Wl,-soname,libgtest.so -o /home/vibek/QRcode_detection/lib/libgtest.so CMakeFiles/gtest.dir/src/gtest-all.cc.o -L/opt/ros/groovy/lib -L/home/vibek/QRcode_detection/build/gtest/src -lpthread -Wl,-rpath,/opt/ros/groovy/lib:/home/vibek/QRcode_detection/build/gtest/src 

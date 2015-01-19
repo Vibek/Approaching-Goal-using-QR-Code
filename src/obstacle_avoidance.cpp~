@@ -1,0 +1,105 @@
+#include <iostream>
+
+#include <ros/console.h>
+#include <ros/ros.h>
+//#include <geometry_msgs/Pose.h>
+#include <geometry_msgs/Point.h>
+#include <geometry_msgs/Twist.h>
+#include <sensor_msgs/LaserScan.h>
+
+#include "naorobot.h"
+#include "obstacle_avoidance.h"
+//#include "apf.h"
+
+using namespace std;
+
+using naorobot::length;
+using geometry_msgs::Pose;
+using geometry_msgs::Point;
+using geometry_msgs::Twist;
+using sensor_msgs::LaserScan;
+double x,y;
+/**
+ * {@inheritDoc}
+ */
+void ObstacleAvoider::updatePose(Pose pose) {
+    //pose = newPose;
+    if (!waypointQueue.empty()) {
+        Point goal = waypointQueue.front();
+        while (!waypointQueue.empty() && length(x,y) < ARRIVED_DISTANCE) {
+            waypointQueue.pop();
+            arrivedQueue.push(goal);
+            goal = waypointQueue.front();
+        }
+    }
+}
+
+/**
+ * {@inheritDoc}
+ */
+void ObstacleAvoider::addWaypoint(Point waypoint) {
+    waypointQueue.push(waypoint);
+}
+
+/**
+ * The publisher for movement velocity commands.
+ */
+ros::Publisher cmdVelPub;
+
+/**
+ * The publisher for waypoints the robot has reached.
+ */
+ros::Publisher waypointsReachedPub;
+
+/**
+ * The obstacle avoider to use.
+ */
+ObstacleAvoider* oa;
+
+/**
+ * Callback for laserscan messages.
+ */
+void scanCallback(LaserScan scan) {
+    Twist t;
+    Polar p = oa->nav(scan);
+    t.linear.x = p.d;
+    t.angular.z = p.a;
+    cmdVelPub.publish(t);
+}
+
+
+/**
+ * Callback for pose messages.
+ */
+void poseCallback(Pose pose) {
+    oa->updatePose(pose);
+    while (!oa->arrivedQueue.empty()) {
+        Point reached = oa->arrivedQueue.front();
+        waypointsReachedPub.publish(reached);
+        oa->arrivedQueue.pop();
+        ROS_INFO("Waypoint reached: (%.2f, %.2f)", reached.x, reached.y);
+    }
+}
+
+
+/**
+ * Callback for new waypoint messages.
+ */
+void waypointCallback(Point waypoint) {
+    oa->addWaypoint(waypoint);
+    ROS_INFO("Waypoint added: (%.2f, %.2f)", waypoint.x, waypoint.y);
+}
+
+int main(int argc, char** argv) {
+    ros::init(argc, argv, "obstacle_avoidance");
+    ros::NodeHandle n;
+    cmdVelPub = n.advertise<Twist>("/RosAria/cmd_vel", 100);
+    waypointsReachedPub = n.advertise<Point>("/waypoints_reached", 1000);
+    //oa = new APF();
+    ros::Subscriber scanSub = n.subscribe("/scan", 100, &scanCallback);
+    ros::Subscriber poseSub = n.subscribe("/pose", 100, &poseCallback);
+    ros::Subscriber waypointSub = n.subscribe("/waypoints", 1000, &waypointCallback);
+    ros::spin();
+    //delete oa;
+    return 0;
+}
