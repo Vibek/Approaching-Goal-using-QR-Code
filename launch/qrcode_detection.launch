@@ -1,18 +1,17 @@
 <launch>
+
   <remap from="image_percept" to="worldmodel/image_percept" />
 
-  <node name="qrcode_detection_kinect" pkg="nodelet" type="nodelet" args="load hector_qrcode_detection/qrcode_detection openni/openni_nodelet_manager">
-    <remap from="openni/image"             to="openni/rgb/image_mono" />
-    <remap from="openni/image_percept"     to="worldmodel/image_percept" />
-    <remap from="openni/image/qrcode"      to="image/qrcode" />
-    <remap from="openni/image/camera_info" to="image/camera_info" />
-  </node>
+  <param name="use_sim_time" value="true" />
 
-  <node name="qrcode_detection_pseye_left" pkg="nodelet" type="nodelet" args="load hector_qrcode_detection/qrcode_detection pseye_camera_left">
-    <remap from="image" to="left/image_mono" />
-  </node>
+   <node pkg="tf" type="static_transform_publisher" name="base_to_kinect_tf" args="0.0 0 0.0 0 0 0 base_link /camera_link 100" />
 
-  <node name="qrcode_detection_pseye_right" pkg="nodelet" type="nodelet" args="load hector_qrcode_detection/qrcode_detection pseye_camera_right">
-    <remap from="image_raw" to="right/image_mono" />
-  </node>
+    <include file ="$(find openni_launch)/launch/openni.launch" />
+
+     <node pkg="QRcode_detection" type="QRcode_detection" name="QRcode_detection" output="screen" />
+   
+ <node pkg = "rqt_gui" type ="rqt_gui" name="rqt_gui" respawn="true">
+</node>
+
+  
 </launch>
