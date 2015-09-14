@@ -8,3 +8,7 @@ The repository contains ROS packages for landmark (QR code) based navigation to 
 3. Navigation using predefined path using QR code basec landmark.
 
 Hardware: Seekur Jr mobile robot (Adept Mobile Robot), Nao Humannoid Robot
+
+Video:
+
+https://www.youtube.com/watch?v=U04t3UTHL30
