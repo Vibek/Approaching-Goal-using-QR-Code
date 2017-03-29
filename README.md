@@ -8,7 +8,7 @@ The repository contains ROS packages for landmark (QR code) based mobile robot n
 2. The proposed method used APF (Artificial Potential Feild) for path planning.
 3. Navigating all the QR code attached landmark in the environment.
 4. Write the goal position (x,y) coordinates marked with QR landmark in a txt file.
-5. Write the current robot posture position from the robot odometry in a txt file.
+5. Write the current robot posture position (x,y,z) coordinates from the robot odometry in a txt file.
 
 Hardware used: Seekur Jr mobile robot (Adept Mobile Robot), Nao Humannoid Robot.
 
